@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartHire AI - Recruitment Web Platform</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Notification Toast Banner -->
+    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-x-full transition-transform duration-300 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center space-x-3 border border-slate-700">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toast-message" class="text-sm font-medium">Action completed successfully.</span>
+    </div>
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-slate-950 text-slate-300 flex flex-col justify-between hidden md:flex border-r border-slate-800">
+            <div>
+                <!-- Brand Header -->
+                <div class="h-16 flex items-center px-6 border-b border-slate-800 space-x-3">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/30">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <div>
+                        <span class="text-white font-bold text-lg tracking-tight">SmartHire <span class="text-indigo-400 text-xs px-1.5 py-0.5 rounded bg-indigo-950 border border-indigo-800">AI Proto</span></span>
+                    </div>
+                </div>
+
+                <!-- Nav Links -->
+                <nav class="p-4 space-y-1.5">
+                    <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-400 hover:bg-slate-900 hover:text-white" data-target="dashboard">
+                        <i class="fa-solid fa-chart-pie w-5"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    <button onclick="switchTab('jobs')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-400 hover:bg-slate-900 hover:text-white" data-target="jobs">
+                        <i class="fa-solid fa-briefcase w-5"></i>
+                        <span>Jobs</span>
+                    </button>
+                    <button onclick="switchTab('candidates')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-400 hover:bg-slate-900 hover:text-white" data-target="candidates">
+                        <i class="fa-solid fa-users w-5"></i>
+                        <span>Candidates</span>
+                    </button>
+                    <button onclick="switchTab('matching')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-400 hover:bg-slate-900 hover:text-white" data-target="matching">
+                        <i class="fa-solid fa-scale-balanced w-5"></i>
+                        <span>Skill Matching</span>
+                    </button>
+                    <button onclick="switchTab('insights')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-400 hover:bg-slate-900 hover:text-white" data-target="insights">
+                        <i class="fa-solid fa-lightbulb w-5"></i>
+                        <span>Insights & Q&A</span>
+                    </button>
+                    <button onclick="switchTab('pipeline')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-400 hover:bg-slate-900 hover:text-white" data-target="pipeline">
+                        <i class="fa-solid fa-bars-staggered w-5"></i>
+                        <span>Hiring Pipeline</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Footer Sidebar info -->
+            <div class="p-4 border-t border-slate-800 text-xs text-slate-500">
+                <div class="flex items-center justify-between">
+                    <span>Fictional Prototype v1.0</span>
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Wrapper -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+            <!-- Top Header -->
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-10">
+                <div class="flex items-center space-x-4">
+                    <!-- Mobile Menu Button -->
+                    <button class="md:hidden text-slate-600 focus:outline-none" onclick="toggleMobileSidebar()">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                    <h1 id="page-title" class="text-xl font-bold text-slate-900 tracking-tight">Dashboard Overview</h1>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <button onclick="resetDemoData()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-3 py-2 rounded-lg transition-all border border-slate-300">
+                        <i class="fa-solid fa-rotate-right mr-1.5"></i> Reset Demo Data
+                    </button>
+                    <div class="w-9 h-9 rounded-full bg-indigo-600 text-white font-semibold flex items-center justify-center text-sm shadow">
+                        HR
+                    </div>
+                </div>
+            </header>
+
+            <!-- Mobile Drawer Menu -->
+            <div id="mobile-sidebar" class="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-sm hidden flex md:hidden">
+                <div class="w-64 bg-slate-950 text-slate-300 flex flex-col justify-between h-full">
+                    <div>
+                        <div class="h-16 flex items-center justify-between px-6 border-b border-slate-800">
+                            <span class="text-white font-bold text-lg">SmartHire AI</span>
+                            <button onclick="toggleMobileSidebar()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                        </div>
+                        <nav class="p-4 space-y-1.5">
+                            <button onclick="switchTab('dashboard'); toggleMobileSidebar();" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-900">Dashboard</button>
+                            <button onclick="switchTab('jobs'); toggleMobileSidebar();" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-900">Jobs</button>
+                            <button onclick="switchTab('candidates'); toggleMobileSidebar();" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-900">Candidates</button>
+                            <button onclick="switchTab('matching'); toggleMobileSidebar();" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-900">Skill Matching</button>
+                            <button onclick="switchTab('insights'); toggleMobileSidebar();" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-900">Insights & Q&A</button>
+                            <button onclick="switchTab('pipeline'); toggleMobileSidebar();" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-900">Hiring Pipeline</button>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area Scrollable -->
+            <main class="flex-1 overflow-y-auto p-6 md:p-8">
+
+                <!-- 1. DASHBOARD TAB -->
+                <section id="tab-dashboard" class="tab-content space-y-6">
+                    <div class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 rounded-2xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden">
+                        <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl">
+                            <i class="fa-solid fa-users-gear"></i>
+                        </div>
+                        <div class="max-w-xl relative z-10">
+                            <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">Welcome to SmartHire AI</h2>
+                            <p class="mt-2 text-indigo-200 text-sm md:text-base leading-relaxed">
+                                Streamline your talent acquisition pipeline with transparent rule-based skill matching, automated question insights, and structured candidate stages.
+                            </p>
+                            <div class="mt-5 flex flex-wrap gap-3">
+                                <button onclick="switchTab('jobs')" class="bg-white text-indigo-900 hover:bg-indigo-50 font-semibold px-4 py-2.5 rounded-xl text-sm shadow transition-all">
+                                    <i class="fa-solid fa-plus mr-1.5"></i> Post New Job
+                                </button>
+                                <button onclick="switchTab('matching')" class="bg-indigo-700/80 hover:bg-indigo-700 text-white font-semibold px-4 py-2.5 rounded-xl text-sm backdrop-blur border border-indigo-600 transition-all">
+                                    <i class="fa-solid fa-scale-balanced mr-1.5"></i> Run Skill Match
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistics Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Open Jobs</p>
+                                <h3 id="stat-total-jobs" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-briefcase"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Candidates</p>
+                                <h3 id="stat-total-candidates" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Active Interviews</p>
+                                <h3 id="stat-total-interviews" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-comments"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Offers / Hired</p>
+                                <h3 id="stat-total-hired" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-award"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pipeline Breakdown Summary Card -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-bold text-lg text-slate-900">Candidates by Pipeline Stage</h3>
+                            <button onclick="switchTab('pipeline')" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800">View Pipeline Kanban <i class="fa-solid fa-arrow-right ml-1"></i></button>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                                <span class="block text-xs font-medium text-slate-500 uppercase">New</span>
+                                <span id="count-stage-new" class="text-2xl font-bold text-slate-900 mt-1 block">0</span>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                                <span class="block text-xs font-medium text-slate-500 uppercase">Review</span>
+                                <span id="count-stage-review" class="text-2xl font-bold text-slate-900 mt-1 block">0</span>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                                <span class="block text-xs font-medium text-slate-500 uppercase">Interview</span>
+                                <span id="count-stage-interview" class="text-2xl font-bold text-slate-900 mt-1 block">0</span>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                                <span class="block text-xs font-medium text-slate-500 uppercase">Offer</span>
+                                <span id="count-stage-offer" class="text-2xl font-bold text-slate-900 mt-1 block">0</span>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center col-span-2 sm:col-span-1">
+                                <span class="block text-xs font-medium text-slate-500 uppercase">Hired</span>
+                                <span id="count-stage-hired" class="text-2xl font-bold text-emerald-600 mt-1 block">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. JOBS TAB -->
+                <section id="tab-jobs" class="tab-content hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div class="relative flex-1 max-w-md">
+                            <i class="fa-solid fa-search absolute left-3.5 top-3.5 text-slate-400"></i>
+                            <input type="text" id="job-search" placeholder="Search jobs by title, department, or skills..." oninput="renderJobs()" class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <button onclick="openJobModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm shadow transition-all flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Create Job Opening</span>
+                        </button>
+                    </div>
+
+                    <!-- Jobs List Grid -->
+                    <div id="jobs-container" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </section>
+
+                <!-- 3. CANDIDATES TAB -->
+                <section id="tab-candidates" class="tab-content hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div class="flex flex-wrap items-center gap-3 flex-1">
+                            <div class="relative flex-1 min-w-[240px] max-w-md">
+                                <i class="fa-solid fa-search absolute left-3.5 top-3.5 text-slate-400"></i>
+                                <input type="text" id="candidate-search" placeholder="Search candidates by name or skills..." oninput="renderCandidates()" class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <select id="candidate-filter-status" onchange="renderCandidates()" class="bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="">All Statuses</option>
+                                <option value="New">New</option>
+                                <option value="Review">Review</option>
+                                <option value="Interview">Interview</option>
+                                <option value="Offer">Offer</option>
+                                <option value="Hired">Hired</option>
+                            </select>
+                        </div>
+                        <button onclick="openCandidateModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm shadow transition-all flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>Add Candidate</span>
+                        </button>
+                    </div>
+
+                    <!-- Candidates Table -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                        <th class="p-4">Candidate Name</th>
+                                        <th class="p-4">Experience</th>
+                                        <th class="p-4">Education</th>
+                                        <th class="p-4">Skills</th>
+                                        <th class="p-4">Status</th>
+                                        <th class="p-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="candidates-table-body" class="divide-y divide-slate-100 text-sm">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. MATCHING TAB -->
+                <section id="tab-matching" class="tab-content hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+                        <div>
+                            <h3 class="font-bold text-lg text-slate-900">Skill Matching Engine</h3>
+                            <p class="text-xs text-slate-500 mt-1">Select a Job requisition and a Candidate profile to evaluate skill alignment transparently.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Select Job Requisition</label>
+                                <select id="match-job-select" onchange="runSkillMatch()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Select Candidate Profile</label>
+                                <select id="match-candidate-select" onchange="runSkillMatch()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Matching Results Box -->
+                    <div id="matching-results-area" class="space-y-5">
+                        <!-- Dynamically generated comparison -->
+                    </div>
+                </section>
+
+                <!-- 5. INSIGHTS & Q&A TAB -->
+                <section id="tab-insights" class="tab-content hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+                        <div>
+                            <h3 class="font-bold text-lg text-slate-900">Interview Insights & Clarifications</h3>
+                            <p class="text-xs text-slate-500 mt-1">Select a job position to automatically generate tailored interview questions and highlight profile details needing clarification.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Target Job Requisition</label>
+                            <select id="insights-job-select" onchange="renderInsights()" class="w-full max-w-md bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="insights-output-area" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Dynamically populated insights -->
+                    </div>
+                </section>
+
+                <!-- 6. HIRING PIPELINE TAB -->
+                <section id="tab-pipeline" class="tab-content hidden space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-bold text-lg text-slate-900">Hiring Pipeline Kanban</h3>
+                            <p class="text-xs text-slate-500 mt-1">Update candidate stages across the hiring workflow.</p>
+                        </div>
+                    </div>
+
+                    <!-- Kanban Board Columns -->
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 overflow-x-auto pb-4">
+                        <!-- New Column -->
+                        <div class="bg-slate-100/80 rounded-2xl p-4 border border-slate-200 flex flex-col min-w-[240px]">
+                            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200">
+                                <span class="font-bold text-sm text-slate-700">New Candidates</span>
+                                <span id="badge-col-new" class="bg-slate-200 text-slate-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                            </div>
+                            <div id="kanban-new" class="flex-1 space-y-3 min-h-[300px]"></div>
+                        </div>
+
+                        <!-- Review Column -->
+                        <div class="bg-slate-100/80 rounded-2xl p-4 border border-slate-200 flex flex-col min-w-[240px]">
+                            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200">
+                                <span class="font-bold text-sm text-indigo-700">Under Review</span>
+                                <span id="badge-col-review" class="bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                            </div>
+                            <div id="kanban-review" class="flex-1 space-y-3 min-h-[300px]"></div>
+                        </div>
+
+                        <!-- Interview Column -->
+                        <div class="bg-slate-100/80 rounded-2xl p-4 border border-slate-200 flex flex-col min-w-[240px]">
+                            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200">
+                                <span class="font-bold text-sm text-amber-700">Interviewing</span>
+                                <span id="badge-col-interview" class="bg-amber-100 text-amber-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                            </div>
+                            <div id="kanban-interview" class="flex-1 space-y-3 min-h-[300px]"></div>
+                        </div>
+
+                        <!-- Offer Column -->
+                        <div class="bg-slate-100/80 rounded-2xl p-4 border border-slate-200 flex flex-col min-w-[240px]">
+                            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200">
+                                <span class="font-bold text-sm text-purple-700">Offer Extended</span>
+                                <span id="badge-col-offer" class="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                            </div>
+                            <div id="kanban-offer" class="flex-1 space-y-3 min-h-[300px]"></div>
+                        </div>
+
+                        <!-- Hired Column -->
+                        <div class="bg-slate-100/80 rounded-2xl p-4 border border-slate-200 flex flex-col min-w-[240px]">
+                            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200">
+                                <span class="font-bold text-sm text-emerald-700">Hired</span>
+                                <span id="badge-col-hired" class="bg-emerald-100 text-emerald-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                            </div>
+                            <div id="kanban-hired" class="flex-1 space-y-3 min-h-[300px]"></div>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Job Modal (Create / Edit) -->
+    <div id="job-modal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                <h3 id="job-modal-title" class="font-bold text-lg text-slate-900">Create Job Requisition</h3>
+                <button onclick="closeJobModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="job-form" onsubmit="handleJobSubmit(event)" class="p-6 space-y-4">
+                <input type="hidden" id="job-id">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Job Title</label>
+                    <input type="text" id="job-title" required placeholder="e.g. Senior Frontend Developer" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Department</label>
+                        <input type="text" id="job-department" required placeholder="e.g. Engineering" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Experience Level</label>
+                        <select id="job-experience" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="Entry Level">Entry Level</option>
+                            <option value="Mid Level">Mid Level</option>
+                            <option value="Senior">Senior</option>
+                            <option value="Lead / Principal">Lead / Principal</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Required Skills (comma-separated)</label>
+                    <input type="text" id="job-skills" required placeholder="e.g. JavaScript, React, Tailwind, TypeScript" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Job Description</label>
+                    <textarea id="job-description" rows="3" required placeholder="Enter primary responsibilities and qualifications..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+                <div class="flex items-center justify-end space-x-3 pt-3">
+                    <button type="button" onclick="closeJobModal()" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all">Cancel</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-sm font-semibold shadow transition-all">Save Job</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Candidate Modal (Create / Edit) -->
+    <div id="candidate-modal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                <h3 id="candidate-modal-title" class="font-bold text-lg text-slate-900">Add Candidate Profile</h3>
+                <button onclick="closeCandidateModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="candidate-form" onsubmit="handleCandidateSubmit(event)" class="p-6 space-y-4">
+                <input type="hidden" id="candidate-id">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Full Name</label>
+                    <input type="text" id="candidate-name" required placeholder="e.g. Alex Morgan" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Experience (Years)</label>
+                        <input type="text" id="candidate-experience" required placeholder="e.g. 5 Years" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Pipeline Status</label>
+                        <select id="candidate-status" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="New">New</option>
+                            <option value="Review">Review</option>
+                            <option value="Interview">Interview</option>
+                            <option value="Offer">Offer</option>
+                            <option value="Hired">Hired</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Education / Degree</label>
+                    <input type="text" id="candidate-education" required placeholder="e.g. B.S. in Computer Science" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Skills (comma-separated)</label>
+                    <input type="text" id="candidate-skills" required placeholder="e.g. JavaScript, React, HTML, CSS" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="flex items-center justify-end space-x-3 pt-3">
+                    <button type="button" onclick="closeCandidateModal()" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all">Cancel</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-sm font-semibold shadow transition-all">Save Candidate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        const initialJobs = [
+            {
+                id: 'job-1',
+                title: 'Senior Frontend Developer',
+                department: 'Engineering',
+                experience: 'Senior',
+                skills: ['JavaScript', 'React', 'TypeScript', 'Tailwind', 'HTML5'],
+                description: 'We are looking for an experienced Senior Frontend Developer to design and build responsive web applications using modern component architectures.'
+            },
+            {
+                id: 'job-2',
+                title: 'Full Stack Product Engineer',
+                department: 'Product & Tech',
+                experience: 'Mid Level',
+                skills: ['Node.js', 'JavaScript', 'SQL', 'React', 'REST APIs'],
+                description: 'Join our product team to deliver scalable end-to-end features, partnering closely with design and backend teams.'
+            },
+            {
+                id: 'job-3',
+                title: 'UX/UI Product Designer',
+                department: 'Design',
+                experience: 'Senior',
+                skills: ['Figma', 'Wireframing', 'User Research', 'Design Systems', 'Prototyping'],
+                description: 'Lead design systems and user journey optimization across our recruitment SaaS platform.'
+            }
+        ];
+
+        const initialCandidates = [
+            {
+                id: 'cand-1',
+                name: 'Jordan Taylor',
+                experience: '6 Years',
+                education: 'M.S. Software Engineering',
+                skills: ['JavaScript', 'React', 'TypeScript', 'Node.js', 'CSS'],
+                status: 'Interview'
+            },
+            {
+                id: 'cand-2',
+                name: 'Samantha Reed',
+                experience: '4 Years',
+                education: 'B.S. Computer Science',
+                skills: ['React', 'JavaScript', 'HTML5', 'Tailwind'],
+                status: 'Review'
+            },
+            {
+                id: 'cand-3',
+                name: 'Marcus Chen',
+                experience: '5 Years',
+                education: 'B.A. Interaction Design',
+                skills: ['Figma', 'Prototyping', 'User Research', 'Wireframing'],
+                status: 'Offer'
+            },
+            {
+                id: 'cand-4',
+                name: 'Elena Rostova',
+                experience: '2 Years',
+                education: 'B.S. Information Systems',
+                skills: ['Python', 'SQL', 'JavaScript'],
+                status: 'New'
+            }
+        ];
+
+        let jobs = JSON.parse(localStorage.getItem('smarthire_jobs')) || initialJobs;
+        let candidates = JSON.parse(localStorage.getItem('smarthire_candidates')) || initialCandidates;
+
+        function saveState() {
+            localStorage.setItem('smarthire_jobs', JSON.stringify(jobs));
+            localStorage.setItem('smarthire_candidates', JSON.stringify(candidates));
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-message');
+            const iconEl = document.getElementById('toast-icon');
+
+            msgEl.textContent = message;
+            if (type === 'success') {
+                iconEl.className = 'fa-solid fa-circle-check text-emerald-400 text-lg';
+            } else {
+                iconEl.className = 'fa-solid fa-circle-exclamation text-amber-400 text-lg';
+            }
+
+            toast.classList.remove('translate-x-full');
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, 3000);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if(btn.dataset.target === tabId) {
+                    btn.classList.add('bg-slate-900', 'text-white');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    btn.classList.remove('bg-slate-900', 'text-white');
+                    btn.classList.add('text-slate-400');
+                }
+            });
+
+            const titles = {
+                dashboard: 'Dashboard Overview',
+                jobs: 'Job Requisitions',
+                candidates: 'Candidate Database',
+                matching: 'Skill Matching Engine',
+                insights: 'Insights & Interview Questions',
+                pipeline: 'Hiring Pipeline Kanban'
+            };
+            document.getElementById('page-title').textContent = titles[tabId] || 'Dashboard';
+
+            if (tabId === 'dashboard') updateDashboardStats();
+            if (tabId === 'jobs') renderJobs();
+            if (tabId === 'candidates') renderCandidates();
+            if (tabId === 'matching') initMatchingDropdowns();
+            if (tabId === 'insights') initInsightsDropdown();
+            if (tabId === 'pipeline') renderPipeline();
+        }
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('mobile-sidebar');
+            sidebar.classList.toggle('hidden');
+        }
+
+        function resetDemoData() {
+            if (confirm('Reset all jobs and candidates to default sample data?')) {
+                jobs = [...initialJobs];
+                candidates = [...initialCandidates];
+                saveState();
+                initApp();
+                showToast('Reset to initial sample data successfully.');
+            }
+        }
+
+        function updateDashboardStats() {
+            document.getElementById('stat-total-jobs').textContent = jobs.length;
+            document.getElementById('stat-total-candidates').textContent = candidates.length;
+
+            const interviews = candidates.filter(c => c.status === 'Interview').length;
+            const offersHired = candidates.filter(c => c.status === 'Offer' || c.status === 'Hired').length;
+
+            document.getElementById('stat-total-interviews').textContent = interviews;
+            document.getElementById('stat-total-hired').textContent = offersHired;
+
+            document.getElementById('count-stage-new').textContent = candidates.filter(c => c.status === 'New').length;
+            document.getElementById('count-stage-review').textContent = candidates.filter(c => c.status === 'Review').length;
+            document.getElementById('count-stage-interview').textContent = interviews;
+            document.getElementById('count-stage-offer').textContent = candidates.filter(c => c.status === 'Offer').length;
+            document.getElementById('count-stage-hired').textContent = candidates.filter(c => c.status === 'Hired').length;
+        }
+
+        function renderJobs() {
+            const container = document.getElementById('jobs-container');
+            const search = document.getElementById('job-search').value.toLowerCase();
+            
+            const filtered = jobs.filter(j => 
+                j.title.toLowerCase().includes(search) || 
+                j.department.toLowerCase().includes(search) ||
+                j.skills.some(s => s.toLowerCase().includes(search))
+            );
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full bg-white p-10 rounded-2xl border border-slate-200 text-center text-slate-500">
+                        <i class="fa-solid fa-briefcase text-3xl mb-3 text-slate-300"></i>
+                        <p class="font-semibold">No job requisitions found.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(job => `
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4 hover:border-indigo-300 transition-all">
+                    <div>
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">${job.department}</span>
+                                <h3 class="font-bold text-lg text-slate-900 mt-2">${job.title}</h3>
+                            </div>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg font-medium">${job.experience}</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mt-2.5 leading-relaxed line-clamp-2">${job.description}</p>
+                        <div class="mt-4 flex flex-wrap gap-1.5">
+                            ${job.skills.map(s => `<span class="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-medium">${s}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                        <span class="text-slate-400">ID: ${job.id}</span>
+                        <div class="space-x-2">
+                            <button onclick="editJob('${job.id}')" class="text-indigo-600 hover:text-indigo-800 font-semibold px-2 py-1"><i class="fa-solid fa-pen mr-1"></i> Edit</button>
+                            <button onclick="deleteJob('${job.id}')" class="text-rose-600 hover:text-rose-800 font-semibold px-2 py-1"><i class="fa-solid fa-trash mr-1"></i> Delete</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openJobModal(jobId = null) {
+            document.getElementById('job-modal').classList.remove('hidden');
+            if (jobId) {
+                const job = jobs.find(j => j.id === jobId);
+                document.getElementById('job-modal-title').textContent = 'Edit Job Requisition';
+                document.getElementById('job-id').value = job.id;
+                document.getElementById('job-title').value = job.title;
+                document.getElementById('job-department').value = job.department;
+                document.getElementById('job-experience').value = job.experience;
+                document.getElementById('job-skills').value = job.skills.join(', ');
+                document.getElementById('job-description').value = job.description;
+            } else {
+                document.getElementById('job-modal-title').textContent = 'Create Job Requisition';
+                document.getElementById('job-form').reset();
+                document.getElementById('job-id').value = '';
+            }
+        }
+
+        function closeJobModal() {
+            document.getElementById('job-modal').classList.add('hidden');
+        }
+
+        function handleJobSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('job-id').value;
+            const title = document.getElementById('job-title').value;
+            const department = document.getElementById('job-department').value;
+            const experience = document.getElementById('job-experience').value;
+            const skillsRaw = document.getElementById('job-skills').value;
+            const description = document.getElementById('job-description').value;
+
+            const skills = skillsRaw.split(',').map(s => s.trim()).filter(Boolean);
+
+            if (id) {
+                const idx = jobs.findIndex(j => j.id === id);
+                if (idx !== -1) {
+                    jobs[idx] = { id, title, department, experience, skills, description };
+                }
+                showToast('Job updated successfully.');
+            } else {
+                const newJob = {
+                    id: 'job-' + Date.now(),
+                    title, department, experience, skills, description
+                };
+                jobs.push(newJob);
+                showToast('Job created successfully.');
+            }
+
+            saveState();
+            closeJobModal();
+            renderJobs();
+            updateDashboardStats();
+        }
+
+        function editJob(id) {
+            openJobModal(id);
+        }
+
+        function deleteJob(id) {
+            if (confirm('Are you sure you want to delete this job?')) {
+                jobs = jobs.filter(j => j.id !== id);
+                saveState();
+                renderJobs();
+                updateDashboardStats();
+                showToast('Job deleted.', 'warning');
+            }
+        }
+
+        function renderCandidates() {
+            const tbody = document.getElementById('candidates-table-body');
+            const search = document.getElementById('candidate-search').value.toLowerCase();
+            const statusFilter = document.getElementById('candidate-filter-status').value;
+
+            const filtered = candidates.filter(c => {
+                const matchesSearch = c.name.toLowerCase().includes(search) || c.skills.some(s => s.toLowerCase().includes(search));
+                const matchesStatus = statusFilter === '' || c.status === statusFilter;
+                return matchesSearch && matchesStatus;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="p-8 text-center text-slate-400 font-medium">No candidates found.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const statusColors = {
+                'New': 'bg-slate-100 text-slate-700 border-slate-200',
+                'Review': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                'Interview': 'bg-amber-50 text-amber-700 border-amber-200',
+                'Offer': 'bg-purple-50 text-purple-700 border-purple-200',
+                'Hired': 'bg-emerald-50 text-emerald-700 border-emerald-200'
+            };
+
+            tbody.innerHTML = filtered.map(c => `
+                <tr class="hover:bg-slate-50/80 transition-colors">
+                    <td class="p-4 font-semibold text-slate-900">${c.name}</td>
+                    <td class="p-4 text-slate-600">${c.experience}</td>
+                    <td class="p-4 text-slate-600">${c.education}</td>
+                    <td class="p-4">
+                        <div class="flex flex-wrap gap-1">
+                            ${c.skills.map(s => `<span class="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-medium">${s}</span>`).join('')}
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <span class="inline-block text-xs px-2.5 py-1 rounded-full font-semibold border ${statusColors[c.status] || 'bg-slate-100'}">${c.status}</span>
+                    </td>
+                    <td class="p-4 text-right space-x-2">
+                        <button onclick="editCandidate('${c.id}')" class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteCandidate('${c.id}')" class="text-rose-600 hover:text-rose-800 font-semibold text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openCandidateModal(candId = null) {
+            document.getElementById('candidate-modal').classList.remove('hidden');
+            if (candId) {
+                const cand = candidates.find(c => c.id === candId);
+                document.getElementById('candidate-modal-title').textContent = 'Edit Candidate Profile';
+                document.getElementById('candidate-id').value = cand.id;
+                document.getElementById('candidate-name').value = cand.name;
+                document.getElementById('candidate-experience').value = cand.experience;
+                document.getElementById('candidate-education').value = cand.education;
+                document.getElementById('candidate-skills').value = cand.skills.join(', ');
+                document.getElementById('candidate-status').value = cand.status;
+            } else {
+                document.getElementById('candidate-modal-title').textContent = 'Add Candidate Profile';
+                document.getElementById('candidate-form').reset();
+                document.getElementById('candidate-id').value = '';
+            }
+        }
+
+        function closeCandidateModal() {
+            document.getElementById('candidate-modal').classList.add('hidden');
+        }
+
+        function handleCandidateSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('candidate-id').value;
+            const name = document.getElementById('candidate-name').value;
+            const experience = document.getElementById('candidate-experience').value;
+            const education = document.getElementById('candidate-education').value;
+            const skillsRaw = document.getElementById('candidate-skills').value;
+            const status = document.getElementById('candidate-status').value;
+
+            const skills = skillsRaw.split(',').map(s => s.trim()).filter(Boolean);
+
+            if (id) {
+                const idx = candidates.findIndex(c => c.id === id);
+                if (idx !== -1) {
+                    candidates[idx] = { id, name, experience, education, skills, status };
+                }
+                showToast('Candidate updated successfully.');
+            } else {
+                const newCand = {
+                    id: 'cand-' + Date.now(),
+                    name, experience, education, skills, status
+                };
+                candidates.push(newCand);
+                showToast('Candidate added successfully.');
+            }
+
+            saveState();
+            closeCandidateModal();
+            renderCandidates();
+            updateDashboardStats();
+        }
+
+        function editCandidate(id) {
+            openCandidateModal(id);
+        }
+
+        function deleteCandidate(id) {
+            if (confirm('Are you sure you want to delete this candidate?')) {
+                candidates = candidates.filter(c => c.id !== id);
+                saveState();
+                renderCandidates();
+                updateDashboardStats();
+                showToast('Candidate deleted.', 'warning');
+            }
+        }
+
+        function initMatchingDropdowns() {
+            const jobSelect = document.getElementById('match-job-select');
+            const candSelect = document.getElementById('match-candidate-select');
+
+            jobSelect.innerHTML = jobs.map(j => `<option value="${j.id}">${j.title} (${j.department})</option>`).join('');
+            candSelect.innerHTML = candidates.map(c => `<option value="${c.id}">${c.name} - Exp: ${c.experience}</option>`).join('');
+
+            if (jobs.length > 0 && candidates.length > 0) {
+                runSkillMatch();
+            } else {
+                document.getElementById('matching-results-area').innerHTML = '<div class="bg-white p-6 rounded-2xl border border-slate-200 text-center text-slate-500">Please add at least one job and candidate to run skill matching.</div>';
+            }
+        }
+
+        function runSkillMatch() {
+            const jobId = document.getElementById('match-job-select').value;
+            const candId = document.getElementById('match-candidate-select').value;
+
+            const job = jobs.find(j => j.id === jobId);
+            const cand = candidates.find(c => c.id === candId);
+            const resultsArea = document.getElementById('matching-results-area');
+
+            if (!job || !cand) {
+                resultsArea.innerHTML = '';
+                return;
+            }
+
+            const candSkillsLower = cand.skills.map(s => s.toLowerCase());
+
+            const matchingSkills = job.skills.filter(js => candSkillsLower.includes(js.toLowerCase()));
+            const missingSkills = job.skills.filter(js => !candSkillsLower.includes(js.toLowerCase()));
+
+            const totalRequired = job.skills.length;
+            const matchPercentage = totalRequired > 0 ? Math.round((matchingSkills.length / totalRequired) * 100) : 0;
+
+            resultsArea.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Skill Alignment Score</span>
+                        <div class="my-3 text-4xl font-extrabold ${matchPercentage >= 70 ? 'text-emerald-600' : matchPercentage >= 40 ? 'text-amber-600' : 'text-rose-600'}">
+                            ${matchPercentage}%
+                        </div>
+                        <p class="text-xs text-slate-500">${matchingSkills.length} of ${totalRequired} required skills found</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <h4 class="font-bold text-sm text-slate-900 flex items-center">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mr-2"></i> Matching Skills (${matchingSkills.length})
+                        </h4>
+                        <div class="flex flex-wrap gap-1.5 pt-1">
+                            ${matchingSkills.length > 0 ? matchingSkills.map(s => `<span class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-lg font-medium">${s}</span>`).join('') : '<span class="text-xs text-slate-400">None identified</span>'}
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <h4 class="font-bold text-sm text-slate-900 flex items-center">
+                            <i class="fa-solid fa-circle-exclamation text-amber-500 mr-2"></i> Unconfirmed / Missing (${missingSkills.length})
+                        </h4>
+                        <div class="flex flex-wrap gap-1.5 pt-1">
+                            ${missingSkills.length > 0 ? missingSkills.map(s => `<span class="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-lg font-medium">${s}</span>`).join('') : '<span class="text-xs text-emerald-600 font-medium">All required skills present!</span>'}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-indigo-50/60 p-6 rounded-2xl border border-indigo-100 text-xs text-indigo-950 space-y-2">
+                    <h5 class="font-bold text-sm text-indigo-900 flex items-center">
+                        <i class="fa-solid fa-calculator mr-2"></i> Transparent Matching Formula & Rules
+                    </h5>
+                    <p class="leading-relaxed">
+                        This evaluation compares the job's required skills list against the candidate's listed profile skills case-insensitively. 
+                        The match percentage is calculated strictly as: <code class="bg-white px-2 py-0.5 rounded border border-indigo-200 font-mono text-indigo-800">(Matching Skills Count / Total Required Skills Count) × 100</code>.
+                    </p>
+                    <p class="text-indigo-800 font-medium">
+                        Note: This is a deterministic prototype helper to assist recruiters. No automated hiring decisions or AI inferences are made.
+                    </p>
+                </div>
+            `;
+        }
+
+        function initInsightsDropdown() {
+            const select = document.getElementById('insights-job-select');
+            select.innerHTML = jobs.map(j => `<option value="${j.id}">${j.title} (${j.department})</option>`).join('');
+            renderInsights();
+        }
+
+        function renderInsights() {
+            const jobId = document.getElementById('insights-job-select').value;
+            const job = jobs.find(j => j.id === jobId);
+            const output = document.getElementById('insights-output-area');
+
+            if (!job) {
+                output.innerHTML = '';
+                return;
+            }
+
+            const generatedQuestions = [
+                `Can you walk us through a complex project where you utilized ${job.skills[0] || 'core technologies'}?`,
+                `How do you approach testing, maintenance, and scalability for ${job.title} roles?`,
+                `Describe a time when you had to resolve a critical technical bottleneck or disagreement within the ${job.department} team.`
+            ];
+
+            const clarificationPoints = [
+                `Verify depth of hands-on production experience with ${job.skills.slice(0, 2).join(' and ')}.`,
+                `Confirm alignment with ${job.experience} expectations and mentorship capabilities.`,
+                `Discuss timeline availability and salary expectations for the ${job.department} department.`
+            ];
+
+            output.innerHTML = `
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h4 class="font-bold text-base text-slate-900 flex items-center">
+                        <i class="fa-solid fa-comments text-indigo-600 mr-2"></i> Suggested Interview Questions
+                    </h4>
+                    <p class="text-xs text-slate-500">Tailored questions generated from ${job.title} requirements:</p>
+                    <div class="space-y-3 pt-2">
+                        ${generatedQuestions.map((q, idx) => `
+                            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-sm text-slate-700 flex items-start space-x-3">
+                                <span class="bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">${idx + 1}</span>
+                                <span class="leading-snug">${q}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h4 class="font-bold text-base text-slate-900 flex items-center">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i> Details Needing Clarification
+                    </h4>
+                    <p class="text-xs text-slate-500">Key verification items for recruiter screen:</p>
+                    <div class="space-y-3 pt-2">
+                        ${clarificationPoints.map((pt, idx) => `
+                            <div class="bg-amber-50/50 p-3.5 rounded-xl border border-amber-200/60 text-sm text-slate-700 flex items-start space-x-3">
+                                <span class="bg-amber-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">${idx + 1}</span>
+                                <span class="leading-snug">${pt}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPipeline() {
+            const stages = ['New', 'Review', 'Interview', 'Offer', 'Hired'];
+            
+            stages.forEach(stage => {
+                const colContainer = document.getElementById(`kanban-${stage.toLowerCase()}`);
+                const badge = document.getElementById(`badge-col-${stage.toLowerCase()}`);
+                
+                const stageCandidates = candidates.filter(c => c.status === stage);
+                badge.textContent = stageCandidates.length;
+
+                if (stageCandidates.length === 0) {
+                    colContainer.innerHTML = `<div class="text-xs text-slate-400 text-center py-6">No candidates</div>`;
+                    return;
+                }
+
+                colContainer.innerHTML = stageCandidates.map(c => `
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3 hover:shadow transition-all">
+                        <div class="flex items-start justify-between">
+                            <span class="font-bold text-sm text-slate-900">${c.name}</span>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">${c.experience}</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1">
+                            ${c.skills.slice(0, 3).map(s => `<span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">${s}</span>`).join('')}
+                        </div>
+                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span class="text-slate-400 truncate max-w-[100px]">${c.education}</span>
+                            <select onchange="updateCandidateStage('${c.id}', this.value)" class="text-xs bg-slate-50 border border-slate-300 rounded px-2 py-1 font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                <option value="New" ${c.status === 'New' ? 'selected' : ''}>New</option>
+                                <option value="Review" ${c.status === 'Review' ? 'selected' : ''}>Review</option>
+                                <option value="Interview" ${c.status === 'Interview' ? 'selected' : ''}>Interview</option>
+                                <option value="Offer" ${c.status === 'Offer' ? 'selected' : ''}>Offer</option>
+                                <option value="Hired" ${c.status === 'Hired' ? 'selected' : ''}>Hired</option>
+                            </select>
+                        </div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        function updateCandidateStage(candId, newStatus) {
+            const cand = candidates.find(c => c.id === candId);
+            if (cand) {
+                cand.status = newStatus;
+                saveState();
+                renderPipeline();
+                updateDashboardStats();
+                showToast(`Moved ${cand.name} to ${newStatus}.`);
+            }
+        }
+
+        function initApp() {
+            updateDashboardStats();
+            renderJobs();
+            renderCandidates();
+            renderPipeline();
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
